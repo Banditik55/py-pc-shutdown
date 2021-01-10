@@ -5,6 +5,8 @@
 # .env
 # pip3 install -U python-dotenv
 # https://pypi.org/project/python-dotenv/
+#
+# sudo python3 app.py
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -43,6 +45,9 @@ def start_hander(update: Update, context: CallbackContext) -> None:
 		one_time_keyboard = False,
 	)
 	update.message.reply_text(f"Welcome, {update.effective_user.first_name}", reply_markup=reply_markup)
+
+def get_telegram_id(update: Update, context: CallbackContext) -> None:
+	update.message.reply_text(f"Your telegram id: {update.effective_user.id}")
 
 def message_handler(update: Update, context: CallbackContext) -> None:
 	if not is_admin(update.effective_user.id):
@@ -87,9 +92,7 @@ def send_message_to_admin(msg):
 	updater.bot.send_message(adminID, msg)
 
 def shutdown():
-	return
-	# subprocess.call(["shutdown", "/s", "/t", "3"])
-	# subprocess.call(["sudo", "shutdown", "-h", "1"])
+	call(["sudo", "shutdown", "-h", "now"])
 
 def notify():
 	if (timer["active"] == True):
@@ -118,6 +121,7 @@ t = Timer(0, interval)
 t.start()
 
 updater.dispatcher.add_handler(CommandHandler("start", start_hander))
+updater.dispatcher.add_handler(CommandHandler("id", get_telegram_id))
 updater.dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, message_handler))
 updater.dispatcher.add_handler(MessageHandler(Filters.text & Filters.command, command_not_found))
 updater.start_polling()
